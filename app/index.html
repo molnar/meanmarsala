@@ -1,0 +1,122 @@
+<html ng-app="myApp">
+<head>
+<title>MEAN Example</title>
+<script src="http://ajax.googleapis.com/ajax/libs/angularjs/1.3.5/angular.min.js"></script>
+<style type="text/css">
+  body{
+    color:#444;
+    font-family: monospace;
+  }  
+</style>
+</head>
+<body>
+  <div ng-controller="mainCtrl" class="container">
+    <ul>
+      <li ng-repeat="employee in employees">{{employee.fullName}} |<button ng-click="deleteEmployee(employee._id)">Delete This Employee</button><button ng-click="loadEmployee(employee)">Edit Employee</button> </li>
+    </ul>
+    
+    <div ng-hide="formData._id">
+      <h4>Add New Employee</h4>   
+      <form ng-submit="addEmployee()">
+        <input type="text" placeholder="First Name" name="firstName" ng-model="formData.firstName"></br>
+        <input type="text" placeholder="Last Name" name="lastName" ng-model="formData.lastName"></br>
+        <input type="text" placeholder="Full Name" name="fullName" ng-model="formData.fullName"></br>
+        <input type="text" placeholder="Manager ID" name="managerId" ng-model="formData.managerId"></br>
+        <input type="text" placeholder="Manager Name" name="managerName" ng-model="formData.managerName"></br>
+        <input type="text" placeholder="Title" name="title" ng-model="formData.title"></br>
+        <input type="text" placeholder="Department" name="department" ng-model="formData.department"></br>
+        <input type="text" placeholder="Cell Phone" name="cellPhone" ng-model="formData.cellPhone"></br>
+        <input type="text" placeholder="Office Phone" name="officePhone" ng-model="formData.officePhone"></br>
+        <input type="email" placeholder="Email" name="email" ng-model="formData.email"></br>
+        <input type="text" placeholder="City, State" name="city" ng-model="formData.city"></br>
+        <input type="text" placeholder="EmployeeID" name="id" ng-model="formData.id"></br>
+        <input type="submit" value="Submit">
+      </form>  
+    </div>  
+
+    <div ng-show="formData._id">
+      <h4>Edit Employee</h4>   
+      <form ng-submit="editEmployee()">
+        <input type="text" placeholder="First Name" name="firstName" ng-model="formData.firstName"></br>
+        <input type="text" placeholder="Last Name" name="lastName" ng-model="formData.lastName"></br>
+        <input type="text" placeholder="Full Name" name="fullName" ng-model="formData.fullName"></br>
+        <input type="text" placeholder="Manager ID" name="managerId" ng-model="formData.managerId"></br>
+        <input type="text" placeholder="Manager Name" name="managerName" ng-model="formData.managerName"></br>
+        <input type="text" placeholder="Title" name="title" ng-model="formData.title"></br>
+        <input type="text" placeholder="Department" name="department" ng-model="formData.department"></br>
+        <input type="text" placeholder="Cell Phone" name="cellPhone" ng-model="formData.cellPhone"></br>
+        <input type="text" placeholder="Office Phone" name="officePhone" ng-model="formData.officePhone"></br>
+        <input type="email" placeholder="Email" name="email" ng-model="formData.email"></br>
+        <input type="text" placeholder="City, State" name="city" ng-model="formData.city"></br>
+        <input type="text" placeholder="EmployeeID" name="id" ng-model="formData.id"></br>
+        <input type="submit" value="Submit">
+      </form>  
+    </div>  
+
+  </div>
+
+  <script>
+  var app = angular.module("myApp", ['myApp.services']);
+  
+
+  app.controller("mainCtrl", function($scope, $http, getEmployees) {
+      $http.defaults.useXDomain = true;
+      $scope.formData = {};
+
+      $scope.getAllEmployees = function(){
+        getEmployees.get().then(function(d){
+          $scope.employees = d;          
+        });
+      }  
+
+      $scope.loadEmployee =  function(emp){
+        $scope.formData = emp;
+      } 
+      $scope.editEmployee =  function(){
+        var emp = $scope.formData;
+        
+
+        $http.put('http://localhost:3000/employees/'+emp._id, $scope.formData).success(function(data){
+          $scope.getAllEmployees();
+        }); 
+      }   
+
+      $scope.deleteEmployee =  function(empID){       
+        var config = {
+          url:'http://localhost:3000/employees/'+empID, 
+          method:'DELETE',
+          headers: {"Content-Type":"application/json;charset=utf-8"}
+        };
+
+        $http(config).success(function(data){
+          $scope.getAllEmployees();
+        });
+      }
+
+      $scope.addEmployee = function(){        
+        $http.post('http://localhost:3000/employees', $scope.formData).success(function(data){
+          $scope.getAllEmployees();
+        });        
+      }
+
+      
+      $scope.getAllEmployees();
+      
+  });
+
+  angular.module('myApp.services', []).
+  factory('getEmployees', function($http){
+      var getEmployees = {
+        get: function () {
+          var promise = $http.jsonp('http://localhost:3000/employees?callback=JSON_CALLBACK').then(function(response){
+              
+             		return response.data;
+          	});
+          return promise;
+        }
+      }
+      return getEmployees;
+  });
+  </script>
+</body>
+</html>

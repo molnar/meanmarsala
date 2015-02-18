@@ -1,0 +1,137 @@
+<html ng-app="myApp">
+<head>
+<title>MEAN Example</title>
+<script src="//code.jquery.com/jquery-1.11.0.min.js"></script>
+<style type="text/css">
+  body{
+    color:#444;
+    font-family: monospace;
+  }  
+</style>
+</head>
+<body>
+  <div class="container">
+    <ul id="empList">
+     
+    </ul>
+    
+    <div id="addEmployees">
+      <h4>Add New Employee</h4>   
+      <form>
+      	<input type="text" placeholder="First Name" name="firstName"></br>
+      	<input type="text" placeholder="Last Name" name="lastName"></br>
+      	<input type="text" placeholder="Full Name" name="fullName"></br>
+      	<input type="text" placeholder="Manager ID" name="managerId"></br>
+      	<input type="text" placeholder="Manager Name" name="managerName"></br>
+      	<input type="text" placeholder="Title" name="title"></br>
+      	<input type="text" placeholder="Department" name="department"></br>
+      	<input type="text" placeholder="Cell Phone" name="cellPhone"></br>
+      	<input type="text" placeholder="Office Phone" name="officePhone"></br>
+      	<input type="email" placeholder="Email" name="email"></br>
+      	<input type="text" placeholder="City, State" name="city"></br>
+      	<input type="text" placeholder="EmployeeID" name="id"></br>
+      	<input type="button" value="Submit" class="addEmployeeForm">
+      </form>  
+    </div>  
+
+    <div id="editEmployees">
+      <h4>Edit Employee</h4>   
+      <form>
+        <input type="text" placeholder="First Name" name="firstName"></br>
+        <input type="text" placeholder="Last Name" name="lastName"></br>
+        <input type="text" placeholder="Full Name" name="fullName"></br>
+        <input type="text" placeholder="Manager ID" name="managerId"></br>
+        <input type="text" placeholder="Manager Name" name="managerName"></br>
+        <input type="text" placeholder="Title" name="title"></br>
+        <input type="text" placeholder="Department" name="department"></br>
+        <input type="text" placeholder="Cell Phone" name="cellPhone"></br>
+        <input type="text" placeholder="Office Phone" name="officePhone"></br>
+        <input type="email" placeholder="Email" name="email"></br>
+        <input type="text" placeholder="City, State" name="city"></br>
+        <input type="text" placeholder="EmployeeID" name="id"></br>
+        <input type="button" value="Submit" class="editEmployeeForm">
+      </form>  
+    </div>  
+
+  </div>
+
+  <script>
+  $(function () {   
+  		//hide edit employee form until needed
+  		$('#editEmployees').hide();
+
+  		//initial call
+    	var employees = [];
+
+    	function getEmployees(){
+    		$.ajax({
+	    	    type: 'GET',
+	    	    url: 'http://localhost:3000/employees',
+	    	    dataType: 'jsonp',
+	    	    success: function(json) {
+	    	    	employees =  json;
+	    	    	$.each(employees, function(i, val){
+	    	    		var liItem = '<li>'+ val.fullName +' |<button class="empDelete" value="'+val.id+'">Delete This Employee</button><button class="empEdit" value="'+val.id+'">Edit Employee</button> </li>'
+	    	    		$('#empList').append(liItem)
+	    	    	})    	        
+	    	    }
+	    	});
+    	}
+
+    	//listen for edit employee button click
+    	$('ul').on('click', '.empEdit', function(event) {
+    	    
+    	    var empID = event.target.value;
+    		$.ajax({
+	    	    type: 'GET',
+	    	    url: 'http://localhost:3000/employees/'+empID,
+	    	    dataType: 'jsonp',
+	    	    success: function(json) {
+	    	    	   	 console.log(json)       	
+	    	    }
+	    	});
+
+    	});
+    	
+
+    	$('.addEmployeeForm').click(function(event) {    		
+			var formData = {
+				'firstName' : $('input[name=firstName]').val(),
+				'lastName' : $('input[name=lastName]').val(),
+				'fullName' : $('input[name=fullName]').val(),
+				'managerId' : $('input[name=managerId]').val(),
+				'managerName' : $('input[name=managerName]').val(),
+				'title' : $('input[name=title]').val(),
+				'department' : $('input[name=department]').val(),
+				'cellPhone' : $('input[name=cellPhone]').val(),
+				'officePhone' : $('input[name=officePhone]').val(),
+				'email' : $('input[name=email]').val(),
+				'city' : $('input[name=city]').val(),
+				'id' : $('input[name=id]').val()
+				
+			};
+			$.ajax({
+				type 		: 'POST',
+				url 		: 'http://localhost:3000/employees',
+				data 		: formData,
+				dataType 	: 'json',
+				success 	: function(data) {
+					$('#empList').empty();
+					getEmployees();
+				}
+			})
+
+    	});
+
+
+
+
+
+
+    	getEmployees();
+    	
+
+  });
+  </script>
+</body>
+</html>
